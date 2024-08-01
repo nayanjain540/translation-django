@@ -3,9 +3,8 @@ from openai import OpenAI
 import base64
 
 # Create your views here.
-client = OpenAI(
-  api_key="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",
-)
+api_key = os.getenv('OPENAI_API_KEY')
+client = OpenAI(api_key=api_key)
 
 # myapp/views.py
 from django.shortcuts import render, redirect
