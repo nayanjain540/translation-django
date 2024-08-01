@@ -42,13 +42,6 @@ transliterated_terms = [
         "mal_Mlym": "പേയ്മെന്റ് ഗേറ്റ്വേ"
     },
     {
-        "term": "POS",
-        "hin_Deva": "पीओएस",
-        "guj_Gujr": "પીઓએસ",
-        "mar_Deva": "पीओएस",
-        "mal_Mlym": "പി.ഒ.എസ്."
-    },
-    {
         "term": "ATM Card",
         "hin_Deva": "एटीएम कार्ड",
         "guj_Gujr": "એટીએમ કાર્ડ",
@@ -229,13 +222,6 @@ transliterated_terms = [
         "guj_Gujr": "અકાઉન્ટ મેન્ટેનન્સ ફી",
         "mar_Deva": "अकाउंट मेंटेनेंस फी",
         "mal_Mlym": "അക്കൗണ്ട് മെയിന്റനൻസ് ഫീ"
-    },
-    {
-        "term": "Interest",
-        "hin_Deva": "इंटरेस्ट",
-        "guj_Gujr": "ઇન્ટરેસ્ટ",
-        "mar_Deva": "इंटरेस्ट",
-        "mal_Mlym": "ഇന്ററസ്റ്റ്"
     },
     {
         "term": "Compound Interest",

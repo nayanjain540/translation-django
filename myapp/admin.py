@@ -5,3 +5,4 @@ from .models import *
 
 admin.site.register(UploadedImage)
 admin.site.register(ExtractedData)
+admin.site.register(CachedData)

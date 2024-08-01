@@ -23,3 +23,15 @@ class ExtractedData(models.Model):
 
     def __str__(self):
         return self.extracted_data
+
+class CachedData(models.Model):
+    english_sentence = models.TextField(default = "")
+    language_code = models.TextField(default = "")
+    translation = models.TextField(default = "")
+
+    class Meta:
+        verbose_name = "CachedData"
+        verbose_name_plural = "CachedData"
+
+    def __str__(self):
+        return "Sentence-" + self.english_sentence + " translation-" + self.translation
