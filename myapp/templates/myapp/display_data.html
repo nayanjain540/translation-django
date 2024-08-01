@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extracted Data</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 56px;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        footer {
+            background: #f8f9fa;
+            padding: 20px 0;
+            text-align: center;
+        }
+        .pagination {
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <a class="navbar-brand" href="#">Data Translation</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container" style="padding-right: 0px !important;padding-left: 0px !important;max-width: fit-content;">
+        <h1 class="text-center">Data for Translation</h1>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered table-hover">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>English</th>
+                        <th>Hindi</th>
+                        <th>Gujarati</th>
+                        <th>Marathi</th>
+                        <th>Malayalam</th>
+                        <th>Hinglish</th>
+                        <th>Gujarati-English</th>
+                        <th>Marathi-English</th>
+                        <th>Malayalam-English</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in extracted_data %}
+                    <tr>
+                        <td>{{ data.extracted_data }}</td>
+                        <td>{{ data.hindi }}</td>
+                        <td>{{ data.gujarati }}</td>
+                        <td>{{ data.marathi }}</td>
+                        <td>{{ data.malayalam }}</td>
+                        <td>{{ data.hinglish }}</td>
+                        <td>{{ data.gujarati_english }}</td>
+                        <td>{{ data.marathi_english }}</td>
+                        <td>{{ data.malayalam_english }}</td>
+                        <td><a class="btn btn-primary btn-sm" href="{% url 'translate' data.id %}">Translate</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                {% for page_num in page_numbers %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a></li>
+                {% endfor %}
+                <li class="page-item"><a class="page-link" href="#">Next</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Data Translation. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

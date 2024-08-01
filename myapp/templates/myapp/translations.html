@@ -1,0 +1,22 @@
+<!-- templates/translations.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Translations</title>
+</head>
+<body>
+    <h1>Translations</h1>
+    <table border="1">
+        <tr>
+            <th>Language</th>
+            <th>Translation</th>
+        </tr>
+        {% for language, translation in translations.items %}
+        <tr>
+            <td>{{ language }}</td>
+            <td>{{ translation }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
