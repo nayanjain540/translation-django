@@ -45,24 +45,26 @@
             <table class="table table-striped table-bordered table-hover">
                 <thead class="thead-dark">
                     <tr>
-                        <th>English</th>
-                        <th>Hindi</th>
-                        <th>Gujarati</th>
-                        <th>Marathi</th>
-                        <th>Malayalam</th>
+                        <th>English Sentence</th>
+                        <th>Language</th>
+                        <th>Translation</th>
+                        <th>Higher Model Translation</th>
+                        <th></th>
+                        <th>Adaptive Similarity Test</th>
                         
-                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for data in extracted_data %}
                     <tr>
-                        <td>{{ data.extracted_data }}</td>
-                        <td>{{ data.hindi }}</td>
-                        <td>{{ data.gujarati }}</td>
-                        <td>{{ data.marathi }}</td>
-                        <td>{{ data.malayalam }}</td>
-                        <td><a class="btn btn-primary btn-sm" href="{% url 'translate' data.id %}">Translate</a></td>
+                        <td>{{ data.english_sentence }}</td>
+                        <td>{{ data.language_code }}</td>
+                        <td>{{ data.translation }}</td>
+                        <td>{{ data.google_translation }}</td>
+                       
+                        
+                        <td><a class="btn btn-primary btn-sm" href="{% url 'sushi_testing_api' data.id %}">Test(AST)</a></td>
+                        <td>{{ data.sushi_test_result }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

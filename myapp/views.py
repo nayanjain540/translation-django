@@ -4,7 +4,7 @@ import base64
 import os
 # Create your views here.
 #api_key = os.getenv('OPENAI_API_KEY')
-client = OpenAI(api_key="")
+client = OpenAI(api_key="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")
 
 # myapp/views.py
 from django.shortcuts import render, redirect
@@ -19,6 +19,8 @@ import re
 from os import environ
 
 from google.cloud import translate
+import datetime
+import time
 
 
 def contains_english_characters(text):
@@ -80,93 +82,39 @@ def display_data(request, image_id):
     extracted_data = ExtractedData.objects.filter(uploaded_image_id=image_id)
     return render(request, 'myapp/display_data.html', {'extracted_data': extracted_data})
 
+
+
+
 def translate_api(request, data_id):
     extracted_data = ExtractedData.objects.get(id=data_id)
-    # Call your translation API
-    response = requests.post('http://3.222.84.147:5000/predict', data=json.dumps({
-        "input": extracted_data.extracted_data
-    }))
-    translations = response.json()
-    print(translations)
     
-    sending_for_refined_sentences = {}
-    sending_for_refined_sentences["original_english_sentence"] = extracted_data.extracted_data
-    sending_for_refined_sentences["translations"] = translations
+    languages_list = ["hin_Deva", "guj_Gujr", "mar_Deva", "mal_Mlym"]
+    for items in languages_list:
 
-    print(sending_for_refined_sentences)
-    base_system_message = "Can you please check the translations provided and improve them wherever needed. STRICTLY follow the same JSON format in which the input is given."
+        url = "http://127.0.0.1:8000/myapp/translate-particular-sentence/"
 
+        payload = json.dumps({
+          "input": extracted_data.extracted_data,
+          "target_language": items
+        })
+        headers = {
+          'Content-Type': 'application/json'
+        }
 
-    response = client.chat.completions.create(
-                    model="gpt-4o",
-                    response_format={"type": "json_object"},
-                    messages=[
-                            {
-                              "role": "user",
-                              "content": [
-                                {"type": "text", "text": base_system_message},
-                                {"type": "text", "text": f"{sending_for_refined_sentences}"}
-                              ],
-                            },
-                          ],
-                    max_tokens=4096,
-                    )
+        response = requests.request("POST", url, headers=headers, data=payload)
 
-    extracted_text_content = json.loads(response.choices[0].message.content)
+        final_translation = json.loads(response.text)["final_translation"]
 
-    hinglish_translation_json = {}
-    hinglish_translation_json["original_english_sentence"] = extracted_data.extracted_data
-    hinglish_translation_json["translations"] = {"hindi_english":"","gujarati_english":"","marathi_english": "","malayalam_english":""}
-    
-    
-    base_system_message = "Please translate this to the combination of the language given as key. For example hindi_english is a combination of hindi and english.I will give you an example: Mode of Registration in hindi-English is :रजिस्ट्रेशन का तरीका. Similarly gujarati_english is gujarati and english. Mode of Registration in gujarati-English is :રજીસ્ટ્રેશનનો રીત.  Please follow the same JSON format in which the input is given."
-
-    response = client.chat.completions.create(
-                    model="gpt-4o",
-                    response_format={"type": "json_object"},
-                    messages=[
-                            {
-                              "role": "user",
-                              "content": [
-                                {"type": "text", "text": base_system_message},
-                                {"type": "text", "text": "FOLLOW THIS INSTRUCTION PROPERLY : Do not translate shortforms and abbreviations like 'ID, RBL, CIF, PAN etc' "},
-                                {"type": "text", "text": f"{hinglish_translation_json}"}
-                              ],
-                            },
-                          ],
-                    max_tokens=4096,
-                    )
-
-    extracted_text_content_hinglish = json.loads(response.choices[0].message.content)
-
-    print(extracted_text_content)
-    print(extracted_text_content_hinglish)
-
-    try:
-        extracted_data.hindi = extracted_text_content["hin_Deva"]
-        extracted_data.gujarati = extracted_text_content["guj_Gujr"]
-        extracted_data.marathi = extracted_text_content["mar_Deva"]
-        extracted_data.malayalam = extracted_text_content["mal_Mlym"]
-        extracted_data.hinglish = extracted_text_content_hinglish["hindi_english"]
-        extracted_data.gujarati_english = extracted_text_content_hinglish["gujarati_english"]
-        extracted_data.marathi_english = extracted_text_content_hinglish["marathi_english"]
-        extracted_data.malayalam_english = extracted_text_content_hinglish["malayalam_english"]
-        extracted_data.save()
-    
-    except Exception as e:
-        extracted_data.hindi = extracted_text_content["translations"]["hin_Deva"]
-        extracted_data.gujarati = extracted_text_content["translations"]["guj_Gujr"]
-        extracted_data.marathi = extracted_text_content["translations"]["mar_Deva"]
-        extracted_data.malayalam = extracted_text_content["translations"]["mal_Mlym"]
-        extracted_data.hinglish = extracted_text_content_hinglish["translations"]["hindi_english"]
-        extracted_data.gujarati_english = extracted_text_content_hinglish["translations"]["gujarati_english"]
-        extracted_data.marathi_english = extracted_text_content_hinglish["translations"]["marathi_english"]
-        extracted_data.malayalam_english = extracted_text_content_hinglish["translations"]["malayalam_english"]
+        if items == "hin_Deva":
+            extracted_data.hindi = final_translation
+        if items == "guj_Gujr":
+            extracted_data.gujarati = final_translation
+        if items == "mar_Deva":
+            extracted_data.marathi = final_translation
+        if items == "mal_Mlym":
+            extracted_data.malayalam = final_translation
         extracted_data.save()
 
-    
-
-    # extracted_data = ExtractedData.objects.filter(uploaded_image_id=extracted_data.uploaded_image.pk)
     return redirect('display_data', extracted_data.uploaded_image.pk)
 
 def translate_text(text: str, target_language_code: str):
@@ -184,6 +132,115 @@ def translate_text(text: str, target_language_code: str):
     print(response.translations[0])
     return response.translations[0]
 
+def translate_google_api(text: str, target_language_code: str):
+    import requests
+    import json
+
+    url = "http://3.108.207.239:8000/myapp/google-translate-api/"
+
+    payload = json.dumps({
+      "input": text,
+      "target_language": target_language_code
+    })
+    headers = {
+      'Content-Type': 'application/json'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+
+    translations_google = json.loads(response.text)["translations_google"]
+
+    return translations_google
+
+def translate_to_english(text: str, source_language_code: str):
+    import requests
+    import json
+
+    url = "http://3.108.207.239:8000/myapp/google-translate-api/"
+
+    payload = json.dumps({
+      "input": text,
+      "target_language": "en",
+      "source_language_code":source_language_code
+    })
+    headers = {
+      'Content-Type': 'application/json'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+
+    translations_google = json.loads(response.text)["translations_google"]
+
+    return translations_google
+
+
+def sushi_test_api(request, data_id):
+    try:
+        print("cached_data %s", data_id)
+        cached_data = CachedData.objects.get(id=data_id)
+
+        target_language = cached_data.language_code
+        if target_language == "hin_Deva":
+            source_language_code = "hi"
+
+        if target_language == "mar_Deva":
+            source_language_code = "mr"
+
+        if target_language == "guj_Gujr":
+            source_language_code = "gu"
+
+        if target_language == "mal_Mlym":
+            source_language_code = "ml"
+
+        google_translation = translate_to_english(text = cached_data.translation,
+                                                    source_language_code=source_language_code)
+
+        cached_data.google_translation = google_translation
+        print("google translation", google_translation)
+        cached_data.save()
+
+        json_for_translation = {'original_text':cached_data.english_sentence, 'translated_english_text':google_translation}
+        base_system_message = str(json_for_translation)
+        base_system_message += '''
+        The Sushi Test is used to compare translated texts with the original text. The goal is to determine how accurately the key details, phrase structure, article usage, and tonality are preserved in the translation. The test is divided into four main parameters, each with a specified weightage:
+        Key Details: This parameter assesses whether the essential information from the original text is retained in the translation. All significant facts and figures should be correctly translated.
+        Phrase Structure: This evaluates whether the grammatical structure of phrases in the translation matches that of the original text. It specifically focuses on the proper use of conjunctions, verbs, and adverbs. If there are minor issues with conjunctions or verb usage, this can affect the readability but should not drastically alter the meaning. Capitalization should not have a big impact.
+        Article Usage: This checks if articles (e.g., "a," "the") are used correctly in the translation. The correct use of articles is crucial for the clarity of the text. If the original text does not use articles or if article usage is not applicable (due to differences in languages), this parameter may receive a full score of 100%.
+        Tonality: This evaluates whether the tone of the translation matches that of the original text. The tone should be consistent, whether formal, informal, or neutral.
+        Scoring Method:
+        For each parameter, scores are assigned based on how well the translation matches the original text.
+        Each parameter will get a score out of 100
+        If a parameter is not applicable due to differences between languages or contexts (e.g., article usage in a language where articles are not used), it will receive a full score of 100%.
+        
+        Return the following JSON: {‘key_details’: ‘’, ‘phrase_structure’:’’,’article_usage’:’’, ‘tonality’:’’}'''
+
+
+        response_ai = client.chat.completions.create(
+                                    model="gpt-4-turbo",
+                                    response_format={"type": "json_object"},
+                                    messages=[
+                                            {
+                                              "role": "user",
+                                              "content": [
+                                                {"type": "text", "text": base_system_message},
+                                              ],
+                                            },
+                                          ],
+                                    max_tokens=4096,
+                                    )
+
+        extracted_text_content = json.loads(response_ai.choices[0].message.content)
+
+        total_marks = int(extracted_text_content["key_details"])*0.45 + int(extracted_text_content['phrase_structure'])*0.35 + int(extracted_text_content['article_usage'])*0.10 + int(extracted_text_content['tonality'])*0.10
+        cached_data.sushi_test_result = total_marks
+        cached_data.save()
+    except Exception as e:
+        print(str(e))
+        return Response(data={"error":str(e)})
+
+
+    return redirect('sushi-test')
+
 class TranslateParticularQuestionAPI(APIView):
 
     def post(self, request, *args, **kwargs):
@@ -194,6 +251,8 @@ class TranslateParticularQuestionAPI(APIView):
         #["hindi_english", "gujarati_english", "marathi_english", "malayalam_english"]
 
         try:
+
+            start_time = datetime.datetime.now()
 
             request_data = request.data
 
@@ -210,6 +269,9 @@ class TranslateParticularQuestionAPI(APIView):
                 input_sentence = input_sentence.lower()
 
                 if CachedData.objects.filter(english_sentence=original_sentence,language_code=target_language):
+
+                   time.sleep(1)
+
                    response["final_translation"] = CachedData.objects.filter(english_sentence=original_sentence,language_code=target_language)[0].translation
                    response["id_of_translation_word"] = id_of_translation_word
                    response["status"] = 200
@@ -241,7 +303,7 @@ class TranslateParticularQuestionAPI(APIView):
                     "mal_Mlym": "malayalam"
                 }
                 
-                translations_google = translate_text(input_sentence_updated, target_language_dict[target_language]).translated_text
+                translations_google = translate_google_api(input_sentence_updated, target_language_dict[target_language])
                 sending_for_refined_sentences = {}
 
                 sending_for_refined_sentences["original_english_sentence"] = input_sentence_updated
@@ -291,11 +353,18 @@ class TranslateParticularQuestionAPI(APIView):
                 except Exception as e:
                    final_translation = extracted_text_content["corrected_translation"]
 
+
+            if final_translation == "":
+                final_translation = translations_google
             response["final_translation"] = final_translation
+
+
 
             CachedData.objects.create(english_sentence=original_sentence,
                 language_code=target_language,
                 translation=final_translation)
+
+            time.sleep(1)
 
             response["id_of_translation_word"] = id_of_translation_word
             response["status"] = 200
@@ -379,7 +448,7 @@ class TranslateBatchAPI(APIView):
                         "mal_Mlym": "malayalam"
                     }
                     
-                    translations_google = translate_text(input_sentence_updated, target_language_dict[target_language]).translated_text
+                    translations_google = translate_google_api(input_sentence_updated, target_language_dict[target_language])
 
                     sending_for_refined_sentences = {}
                     sending_for_refined_sentences["original_english_sentence"] = input_sentence_updated
@@ -427,6 +496,8 @@ class TranslateBatchAPI(APIView):
                     except Exception as e:
                        final_translation = extracted_text_content["corrected_translation"]
 
+                    if final_translation == "":
+                        final_translation = translations_google
                     final_translation_array.append({"final_translation":final_translation,
                                                         "id_of_translation_word":id_of_translation_word})
 
@@ -445,3 +516,9 @@ class TranslateBatchAPI(APIView):
         return Response(data=response)
 
 TranslateBatch = TranslateBatchAPI.as_view()
+
+
+
+def sushi_test(request):
+    extracted_data = CachedData.objects.filter(want_to_run_sushi_result=True)
+    return render(request, 'myapp/sushi_test.html', {'extracted_data': extracted_data})
