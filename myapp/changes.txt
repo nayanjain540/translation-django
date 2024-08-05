@@ -1,0 +1,17 @@
+1. One Single API for translation and translation batch Not needed
+2. One single translate text Done
+3. One single response function for openai response Done
+4. translate_api is  different on local and server
+5. translate to english is present on server, not on local Not needed
+6. remove google translate api Done
+7. figure how to run google translate api from local server Done
+8. Domain mapping
+9. Changes in URLs 
+10. Cached data also has to be synced
+11. Start using PostgresSQL
+12. Check 4 things:
+		1. Figma 
+		2. Translate batch API - Android App 
+		3. Upload functionality
+		4. Sushi Test
+13. Host the Figma plugin

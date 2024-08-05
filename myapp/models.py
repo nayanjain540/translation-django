@@ -12,10 +12,6 @@ class ExtractedData(models.Model):
     gujarati = models.TextField(null=True, blank=True)
     marathi = models.TextField(null=True, blank=True)
     malayalam = models.TextField(null=True, blank=True)
-    hinglish = models.TextField(null=True, blank=True)
-    gujarati_english = models.TextField(null=True, blank=True)
-    marathi_english = models.TextField(null=True, blank=True)
-    malayalam_english = models.TextField(null=True, blank=True)
 
     class Meta:
         verbose_name = "ExtractedData"
