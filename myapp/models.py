@@ -23,7 +23,7 @@ class ExtractedData(models.Model):
 class CachedData(models.Model):
     english_sentence = models.TextField(default = "", null=True, blank=True)
     language_code = models.TextField(default = "", null=True, blank=True)
-    translation = models.TextField(default = "", , null=True, blank=True)
+    translation = models.TextField(default = "", null=True, blank=True)
 
     google_translation = models.TextField(default= "", null=True, blank=True)
     sushi_test_result = models.TextField(default= "", null=True, blank=True)
