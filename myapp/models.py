@@ -21,12 +21,12 @@ class ExtractedData(models.Model):
         return self.extracted_data
 
 class CachedData(models.Model):
-    english_sentence = models.TextField(default = "")
-    language_code = models.TextField(default = "")
-    translation = models.TextField(default = "", blank=True)
+    english_sentence = models.TextField(default = "", null=True, blank=True)
+    language_code = models.TextField(default = "", null=True, blank=True)
+    translation = models.TextField(default = "", , null=True, blank=True)
 
-    google_translation = models.TextField(default= "", blank=True)
-    sushi_test_result = models.TextField(default= "", blank=True)
+    google_translation = models.TextField(default= "", null=True, blank=True)
+    sushi_test_result = models.TextField(default= "", null=True, blank=True)
 
     want_to_run_sushi_result = models.BooleanField(default = False)
 
