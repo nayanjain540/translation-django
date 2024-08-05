@@ -165,7 +165,6 @@ class TranslateParticularQuestionAPI(APIView):
             if CachedData.objects.filter(english_sentence=input_sentence.lower(),language_code=target_language):
 
                response["final_translation"] = CachedData.objects.filter(english_sentence=input_sentence.lower(),language_code=target_language)[0].translation
-               response["id_of_translation_word"] = id_of_translation_word
                response["status"] = 200
                response["status_message"] = "success"
                return Response(data=response)
