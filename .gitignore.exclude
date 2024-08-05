@@ -4,3 +4,5 @@ log/*
 virtual
 db.sqlite3
 myapp/migrations
+.env
+uploads/*

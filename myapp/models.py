@@ -12,10 +12,6 @@ class ExtractedData(models.Model):
     gujarati = models.TextField(null=True, blank=True)
     marathi = models.TextField(null=True, blank=True)
     malayalam = models.TextField(null=True, blank=True)
-    hinglish = models.TextField(null=True, blank=True)
-    gujarati_english = models.TextField(null=True, blank=True)
-    marathi_english = models.TextField(null=True, blank=True)
-    malayalam_english = models.TextField(null=True, blank=True)
 
     class Meta:
         verbose_name = "ExtractedData"
@@ -27,11 +23,16 @@ class ExtractedData(models.Model):
 class CachedData(models.Model):
     english_sentence = models.TextField(default = "")
     language_code = models.TextField(default = "")
-    translation = models.TextField(default = "")
+    translation = models.TextField(default = "", blank=True)
+
+    google_translation = models.TextField(default= "", blank=True)
+    sushi_test_result = models.TextField(default= "", blank=True)
+
+    want_to_run_sushi_result = models.BooleanField(default = False)
 
     class Meta:
         verbose_name = "CachedData"
         verbose_name_plural = "CachedData"
 
     def __str__(self):
-        return "Sentence-" + self.english_sentence + " translation-" + self.translation
+        return "Sentence-" + self.english_sentence + " language_code-" + self.language_code
